@@ -1,0 +1,53 @@
+version: '3'
+
+networks:
+  bitdb-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.21.0.0/24
+
+services:
+  
+  mongodb:
+    image: 'bitnami/mongodb:latest'
+    networks:
+      bitdb-net:
+        ipv4_address: 172.21.0.10
+    expose:
+      - "27017"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MONGODB_ENABLE_IPV6=no
+    volumes:
+      - /data:/bitnami
+  
+  bitcored:
+    image: 'dalijolijo/bitcored-bitdb'
+    networks:
+      bitdb-net:
+        ipv4_address: 172.21.0.11
+    ports:
+      - "8555:8555"
+    expose:
+      - "8556"
+    volumes:
+      - /data/bitcore-bitdb:/data
+        #command: -rpcuser=root -rpcpassword=bitcore
+
+  docker-bitd-btx:
+    image: 'dalijolijo/docker-bitd-btx'
+    networks:
+      bitdb-net:
+        ipv4_address: 172.21.0.12
+    ports:
+      - "28555:28555"
+    expose:
+      - "28556"
+    environment:
+      - MONGODB_URL='mongodb://172.21.0.10:27017'
+      - RPC_HOST=172.21.0.11
+    depends_on:
+      - "mongodb"
+
