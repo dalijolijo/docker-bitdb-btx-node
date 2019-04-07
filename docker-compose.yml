@@ -36,7 +36,6 @@ services:
       - "8556"
     volumes:
       - /data/bitcore-bitdb:/data
-        #command: -rpcuser=root -rpcpassword=bitcore
 
   docker-bitd-btx:
     image: 'dalijolijo/docker-bitd-btx'
